@@ -1,4 +1,5 @@
 import { useRef, useState, type KeyboardEvent } from 'react'
+import { useI18n } from '../i18n/context'
 import { FEE_TIERS, MAX_FEE_PERCENT } from '../lib/exchange'
 import { formatPercent } from '../lib/format'
 import { NumberField } from './NumberField'
@@ -15,14 +16,15 @@ interface FeeSelectorProps {
 
 const OPTIONS: FeeChoice[] = [...FEE_TIERS, 'custom']
 
-const optionLabel = (o: FeeChoice) => (o === 'custom' ? 'Custom' : o === 0 ? 'No fee' : formatPercent(o))
-
 /** Radio group of fee chips with roving focus (arrow keys), plus a custom % field. */
 export function FeeSelector({ value, onChange, customRaw, onCustomChange, customError }: FeeSelectorProps) {
+  const { t } = useI18n()
   const groupRef = useRef<HTMLDivElement>(null)
   // Focus the custom input only when the user picks "Custom" by clicking, not on page load.
   const [focusCustom, setFocusCustom] = useState(false)
   const selectedIndex = Math.max(0, OPTIONS.indexOf(value))
+
+  const optionLabel = (o: FeeChoice) => (o === 'custom' ? t.custom : o === 0 ? t.noFee : formatPercent(o))
 
   function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     const delta = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]
@@ -36,8 +38,8 @@ export function FeeSelector({ value, onChange, customRaw, onCustomChange, custom
 
   return (
     <fieldset className="fee">
-      <legend className="field__label">Service fee</legend>
-      <div ref={groupRef} className="chips" role="radiogroup" aria-label="Service fee" onKeyDown={handleKeyDown}>
+      <legend className="field__label">{t.serviceFee}</legend>
+      <div ref={groupRef} className="chips" role="radiogroup" aria-label={t.serviceFee} onKeyDown={handleKeyDown}>
         {OPTIONS.map((o, i) => {
           const checked = i === selectedIndex
           return (
@@ -61,14 +63,14 @@ export function FeeSelector({ value, onChange, customRaw, onCustomChange, custom
       {value === 'custom' && (
         <NumberField
           id="custom-fee"
-          label="Custom fee"
+          label={t.customFee}
           value={customRaw}
           onValueChange={onCustomChange}
           unit="%"
           maxFractionDigits={2}
           autoFocus={focusCustom}
           error={customError}
-          hint={`Between 0 and ${MAX_FEE_PERCENT}%`}
+          hint={t.feeRange(MAX_FEE_PERCENT)}
         />
       )}
     </fieldset>

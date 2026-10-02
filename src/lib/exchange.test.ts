@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { convertMmkToVnd, parseNumber } from './exchange'
+import { convertMmkToVnd, convertVndToMmk, parseNumber } from './exchange'
 
 // Reference values come from the original "MMK to VND Exchange App.xlsx" sheet.
 const rates = { mmkPerUsdt: 4445, vndPerUsdt: 26116 }
@@ -35,6 +35,32 @@ describe('convertMmkToVnd', () => {
     expect(convertMmkToVnd(100, { ...rates, vndPerUsdt: Number.NaN })).toBeNull()
     expect(convertMmkToVnd(100, rates, -1)).toBeNull()
     expect(convertMmkToVnd(100, rates, 51)).toBeNull()
+  })
+})
+
+describe('convertVndToMmk', () => {
+  it('is the exact inverse of the forward conversion', () => {
+    for (const fee of [0, 1.5, 2, 2.5, 3, 7.25]) {
+      const forward = convertMmkToVnd(100_000, rates, fee)!
+      const reverse = convertVndToMmk(forward.netVnd, rates, fee)!
+      expect(reverse.mmk).toBeCloseTo(100_000, 6)
+      expect(reverse.usdt).toBeCloseTo(forward.usdt, 10)
+      expect(reverse.grossVnd).toBeCloseTo(forward.grossVnd, 6)
+      expect(reverse.feeVnd).toBeCloseTo(forward.feeVnd, 6)
+    }
+  })
+
+  it('matches the spreadsheet: receiving 575,785.83 VND at 2% costs 100,000 MMK', () => {
+    const r = convertVndToMmk(575785.82677165349, rates, 2)!
+    expect(r.mmk).toBeCloseTo(100_000, 6)
+    expect(r.feeVnd).toBeCloseTo(11750.731158605175, 6)
+  })
+
+  it('rejects invalid input', () => {
+    expect(convertVndToMmk(Number.NaN, rates)).toBeNull()
+    expect(convertVndToMmk(-1, rates)).toBeNull()
+    expect(convertVndToMmk(100, { ...rates, vndPerUsdt: 0 })).toBeNull()
+    expect(convertVndToMmk(100, rates, 51)).toBeNull()
   })
 })
 

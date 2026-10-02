@@ -55,6 +55,32 @@ export function convertMmkToVnd(mmk: number, rates: Rates, feePercent = 0): Conv
   }
 }
 
+/**
+ * Reverse direction: how much MMK the customer must send so that they receive
+ * exactly `netVnd` after the service fee. Returns the same shape as the forward
+ * conversion, so the UI can show both directions the same way.
+ */
+export function convertVndToMmk(netVnd: number, rates: Rates, feePercent = 0): Conversion | null {
+  const { mmkPerUsdt, vndPerUsdt } = rates
+  if (!Number.isFinite(netVnd) || netVnd < 0) return null
+  if (!Number.isFinite(mmkPerUsdt) || mmkPerUsdt <= 0) return null
+  if (!Number.isFinite(vndPerUsdt) || vndPerUsdt <= 0) return null
+  if (!isValidFee(feePercent)) return null
+
+  const grossVnd = netVnd / (1 - feePercent / 100)
+  const usdt = grossVnd / vndPerUsdt
+
+  return {
+    mmk: usdt * mmkPerUsdt,
+    usdt,
+    grossVnd,
+    feePercent,
+    feeVnd: grossVnd - netVnd,
+    netVnd,
+    vndPerMmk: vndPerUsdt / mmkPerUsdt,
+  }
+}
+
 /** Parse a raw input string (no thousands separators). Empty or partial input yields NaN. */
 export function parseNumber(raw: string): number {
   if (raw.trim() === '' || raw === '.') return Number.NaN
