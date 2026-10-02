@@ -2,7 +2,16 @@
 
 A fast, mobile-friendly calculator that converts **Myanmar Kyat (MMK)** to **Vietnamese Dong (VND)** through **USDT**, using the Binance P2P rates you enter, and shows how much the customer receives at each service-fee tier.
 
-**Live demo:** `https://htetnaing-hub.github.io/mmk-vnd-exchange/`
+<p>
+  <a href="https://htetnaing-hub.github.io/mmk-vnd-exchange/"><img alt="Open live demo" src="https://img.shields.io/badge/Live_demo-Open_app-0f766e?style=for-the-badge"></a>
+  <a href="https://github.com/htetnaing-hub/mmk-vnd-exchange/actions/workflows/deploy.yml"><img alt="Deploy status" src="https://github.com/htetnaing-hub/mmk-vnd-exchange/actions/workflows/deploy.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue"></a>
+</p>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
+  <img alt="Screenshot of the MMK to VND Exchange app" src="docs/screenshot-light.png">
+</picture>
 
 ## How it works
 
@@ -23,10 +32,20 @@ Customer receives = VND − Profit
 
 With the example values, 100,000 MMK → 22.4972 USDT → **587,537 VND**. At a 2% fee the profit is 11,751 VND and the customer receives 575,786 VND.
 
+**VND → MMK mode** works backwards: enter how much VND the customer should receive, and the app shows how much MMK they need to send (rounded up to the next kyat).
+
+```
+VND before fee = VND received ÷ (1 − fee% ÷ 100)
+USDT           = VND before fee ÷ VND rate
+MMK to send    = USDT × MMK rate
+```
+
 ## Features
 
+- Two directions: **MMK → VND** and **VND → MMK**
+- **English and Burmese (မြန်မာ)** interface, picked from the browser's language on the first visit
 - Live conversion with thousands separators as you type
-- Quick amount buttons (100K, 500K, 1M, 5M, 10M)
+- Quick amount buttons for each direction
 - Fee presets (0%, 1.5%, 2%, 2.5%, 3%) plus a custom fee
 - Fee comparison table; tap a row to apply that fee
 - MMK → USDT → VND breakdown and effective cross rate
@@ -87,6 +106,7 @@ The build uses relative asset paths, so it works under any repository name.
 
 - **GitHub link and defaults:** edit [`src/config.ts`](src/config.ts) to set your repository URL, starting values and quick amounts.
 - **Fee tiers:** edit `FEE_TIERS` in [`src/lib/exchange.ts`](src/lib/exchange.ts).
+- **Translations:** all interface text lives in [`src/i18n/messages.tsx`](src/i18n/messages.tsx). Edit the `my` section to adjust the Burmese wording.
 - **Colours:** every colour is a CSS variable at the top of [`src/index.css`](src/index.css), for both light and dark themes.
 
 ## Project structure
@@ -107,8 +127,13 @@ src/
 │   ├── usePersistentState.ts
 │   ├── useInView.ts
 │   └── useTheme.ts
+├── i18n/
+│   ├── messages.tsx        English and Burmese text
+│   ├── context.ts          useI18n() hook
+│   └── I18nProvider.tsx    Language state and detection
 └── lib/
-    ├── exchange.ts         Conversion logic (pure, unit-tested)
+    ├── exchange.ts         Conversion logic, both directions (pure, unit-tested)
+    ├── direction.ts        MMK → VND / VND → MMK helpers
     └── format.ts           Number formatting helpers
 ```
 
