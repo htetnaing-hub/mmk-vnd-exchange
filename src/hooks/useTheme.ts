@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { isStandalone } from '../lib/platform'
 
 export type Theme = 'light' | 'dark'
 
@@ -16,9 +17,9 @@ export function useTheme(): [Theme, () => void] {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', theme === 'dark' ? '#0b1020' : '#f3f5f8')
+    // In app mode the top bar is always dark (see index.css), so the system bar matches it.
+    const color = isStandalone() ? '#0f2a2c' : theme === 'dark' ? '#0b1020' : '#f3f5f8'
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color)
   }, [theme])
 
   const toggle = () => {

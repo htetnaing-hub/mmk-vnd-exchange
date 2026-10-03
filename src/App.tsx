@@ -3,6 +3,7 @@ import { CurrencyBadge } from './components/CurrencyBadge'
 import { FeeSelector, type FeeChoice } from './components/FeeSelector'
 import { FeeTable } from './components/FeeTable'
 import { GitHubIcon, MoonIcon, ResetIcon, SunIcon } from './components/Icons'
+import { InstallHint } from './components/InstallHint'
 import { NumberField } from './components/NumberField'
 import { ResultCard } from './components/ResultCard'
 import { DEFAULTS, QUICK_AMOUNTS, QUICK_AMOUNTS_VND, REPO_URL } from './config'
@@ -116,6 +117,8 @@ export default function App() {
       </header>
 
       <main className="container main">
+        <InstallHint />
+
         <div className="intro">
           <p className="eyebrow">{t.eyebrow}</p>
           <h1 className="title">{t.title}</h1>

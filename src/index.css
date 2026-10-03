@@ -121,6 +121,17 @@ input {
 
 button {
   cursor: pointer;
+  /* No double-tap zoom delay on phones. */
+  touch-action: manipulation;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 a {
@@ -142,12 +153,15 @@ a:hover {
   width: 100%;
   max-width: 1080px;
   margin-inline: auto;
-  padding-inline: 16px;
+  /* Keep clear of the notch when an iPhone is turned sideways. */
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
 }
 
 @media (min-width: 640px) {
   .container {
-    padding-inline: 24px;
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
   }
 }
 
@@ -167,6 +181,8 @@ a:hover {
   -webkit-backdrop-filter: saturate(160%) blur(12px);
   background: color-mix(in srgb, var(--bg) 78%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  /* Room for the iPhone status bar when installed as an app. */
+  padding-top: env(safe-area-inset-top);
 }
 
 .topbar__inner {
@@ -322,6 +338,7 @@ a:hover {
 
 .grid {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
@@ -625,7 +642,7 @@ a:hover {
 /* 7 options (6 tiers + Custom): two balanced rows at every width. */
 .chips {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   clear: both;
 }
@@ -916,7 +933,7 @@ a:hover {
 
 .segmented {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--border);
@@ -958,6 +975,13 @@ a:hover {
   width: 20px;
   height: 20px;
   font-size: 11px;
+}
+
+/* Small phones: drop the coin icons so "MMK → VND" fits on one line. */
+@media (max-width: 400px) {
+  .segmented__btn .badge {
+    display: none;
+  }
 }
 
 /* ───────────────────────── Language ───────────────────────── */
@@ -1063,6 +1087,97 @@ a:hover {
   }
 }
 
+/* ───────────────────────── Install hint (iOS Safari) ───────────────────────── */
+
+.install-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.install-hint__icon {
+  flex: none;
+  border-radius: 10px;
+}
+
+.install-hint__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.install-hint__title {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.install-hint__share {
+  display: inline-flex;
+  vertical-align: -3px;
+  color: var(--accent);
+}
+
+.install-hint__close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.install-hint__close:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+/* ───────────────────────── Installed app mode ───────────────────────── */
+
+/* The iOS status bar text is white in app mode, so the top bar is always dark there. */
+@media (display-mode: standalone) {
+  .topbar {
+    background: #0f2a2c;
+    border-bottom-color: transparent;
+  }
+
+  .topbar .brand {
+    color: #f8fafc;
+  }
+
+  .topbar .brand__mark span {
+    box-shadow: 0 0 0 2px #0f2a2c;
+  }
+
+  .topbar .brand__arrow {
+    color: #5eead4;
+  }
+
+  .topbar .icon-btn {
+    border-color: rgb(255 255 255 / 0.14);
+    background: rgb(255 255 255 / 0.08);
+    color: #e2e8f0;
+  }
+
+  .topbar .icon-btn:hover {
+    background: rgb(255 255 255 / 0.16);
+    color: #fff;
+  }
+
+  .topbar :focus-visible {
+    outline-color: #5eead4;
+  }
+}
+
 /* ───────────────────────── Footer ───────────────────────── */
 
 .footer {
@@ -1076,7 +1191,8 @@ a:hover {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px 24px;
-  padding-block: 20px 28px;
+  padding-top: 20px;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom));
 }
 
 /* ───────────────────────── Motion ───────────────────────── */

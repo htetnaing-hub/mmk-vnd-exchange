@@ -60,6 +60,14 @@ const en = {
 
   details: 'Details',
 
+  installTitle: 'Use it like an app',
+  installBody: (share: ReactNode): ReactNode => (
+    <>
+      Tap {share} then <strong>Add to Home Screen</strong>. It works offline too.
+    </>
+  ),
+  dismiss: 'Dismiss',
+
   disclaimer: 'Rates are entered manually and may differ from live Binance P2P prices. Not financial advice.',
   builtWith: 'Built with React & TypeScript',
   openSource: 'Open source on GitHub',
@@ -121,6 +129,14 @@ const my: Messages = {
   profit: 'အမြတ်',
 
   details: 'အသေးစိတ်',
+
+  installTitle: 'App အဖြစ် အသုံးပြုရန်',
+  installBody: (share) => (
+    <>
+      {share} ကိုနှိပ်ပြီး <strong>Add to Home Screen</strong> ကို ရွေးပါ။ အင်တာနက်မရှိလည်း သုံးနိုင်ပါသည်။
+    </>
+  ),
+  dismiss: 'ပိတ်ရန်',
 
   disclaimer:
     'ဈေးနှုန်းများကို ကိုယ်တိုင်ထည့်ရသဖြင့် Binance P2P ၏ လက်ရှိဈေးနှင့် ကွာခြားနိုင်ပါသည်။ ငွေကြေးဆိုင်ရာ အကြံပြုချက် မဟုတ်ပါ။',

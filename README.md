@@ -49,9 +49,20 @@ Example: 1,000,000 VND → 38.3347 USDT → **171,740 MMK**. At 2% the profit is
 
 Results are rounded to whole units. These formulas and examples match the original `MMK to VND Exchange App.xlsx` sheet, and the unit tests check every row of it.
 
+## Install on iPhone (works offline)
+
+1. Open the [live app](https://htetnaing-hub.github.io/mmk-vnd-exchange/) in **Safari**.
+2. Tap the **Share** button, then **Add to Home Screen**, then **Add**.
+3. Open it from the new **MMK ⇄ VND** icon. It runs full screen like a normal app.
+
+After the first visit, everything (fonts included) is stored on the phone, so it works with no internet. When you push changes to GitHub, the app updates itself the next time it opens with a connection.
+
+On Android, open it in Chrome and choose **Install app** from the menu.
+
 ## Features
 
 - Two directions: **MMK → VND** and **VND → MMK**
+- **Installable app with offline support** (PWA): home-screen icon, full screen, no internet needed
 - **English and Burmese (မြန်မာ)** interface, picked from the browser's language on the first visit
 - Live conversion with thousands separators as you type
 - Quick amount buttons for each direction
@@ -70,6 +81,7 @@ All open source and widely used, chosen for long-term maintenance:
 
 - [React 19](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
 - [Vite](https://vite.dev) for development and builds
+- [vite-plugin-pwa](https://vite-pwa-org.netlify.app) (Workbox) for offline support and the app manifest
 - [Vitest](https://vitest.dev) for unit tests
 - [ESLint](https://eslint.org) with `typescript-eslint`
 - Plain CSS with design tokens (no UI framework to upgrade)
@@ -93,6 +105,7 @@ Then open http://localhost:5173.
 | `npm run preview` | Serve the production build locally |
 | `npm test` | Run unit tests |
 | `npm run lint` | Lint the code |
+| `npm run generate-icons` | Rebuild app icons from `public/app-icon.svg` |
 
 ## Deploy to GitHub Pages
 
