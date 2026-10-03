@@ -1,31 +1,32 @@
 import { describe, expect, it } from 'vitest'
 import { convertMmkToVnd, convertVndToMmk, parseNumber } from './exchange'
 
-// Reference values come from the original "MMK to VND Exchange App.xlsx" sheet.
-const rates = { mmkPerUsdt: 4445, vndPerUsdt: 26116 }
+// Reference values come from the "MMK to VND Exchange App.xlsx" sheet.
+const rates = { mmkPerUsdt: 4480, vndPerUsdt: 26086 }
 
-describe('convertMmkToVnd', () => {
+describe('convertMmkToVnd (sheet: MMK TO VND)', () => {
   it('matches the spreadsheet with no fee', () => {
-    const r = convertMmkToVnd(100_000, rates, 0)!
-    expect(r.usdt).toBeCloseTo(22.497187851518561, 10)
-    expect(r.grossVnd).toBeCloseTo(587536.55793025868, 6)
-    expect(r.feeVnd).toBe(0)
-    expect(r.netVnd).toBeCloseTo(587536.55793025868, 6)
+    const r = convertMmkToVnd(1_000_000, rates, 0)!
+    expect(r.usdt).toBeCloseTo(223.21428571428572, 10)
+    expect(r.gross).toBeCloseTo(5822767.8571428573, 6)
+    expect(r.fee).toBe(0)
+    expect(r.net).toBeCloseTo(5822767.8571428573, 6)
   })
 
   it.each([
-    [1.5, 8813.0483689538796, 578723.50956130482],
-    [2, 11750.731158605175, 575785.82677165349],
-    [2.5, 14688.413948256468, 572848.14398200216],
-    [3, 17626.096737907759, 569910.46119235095],
+    [1.5, 87341.517857142855, 5735426.3392857146],
+    [2, 116455.35714285714, 5706312.5],
+    [2.5, 145569.19642857145, 5677198.6607142854],
+    [3, 174683.03571428571, 5648084.8214285718],
+    [5, 291138.3928571429, 5531629.4642857146],
   ])('matches the spreadsheet at %s%% fee', (fee, profit, received) => {
-    const r = convertMmkToVnd(100_000, rates, fee)!
-    expect(r.feeVnd).toBeCloseTo(profit, 6)
-    expect(r.netVnd).toBeCloseTo(received, 6)
+    const r = convertMmkToVnd(1_000_000, rates, fee)!
+    expect(r.fee).toBeCloseTo(profit, 6)
+    expect(r.net).toBeCloseTo(received, 6)
   })
 
-  it('reports the effective cross rate', () => {
-    expect(convertMmkToVnd(1, rates)!.vndPerMmk).toBeCloseTo(26116 / 4445, 12)
+  it('reports VND per 1 MMK', () => {
+    expect(convertMmkToVnd(1, rates)!.rate).toBeCloseTo(26086 / 4480, 12)
   })
 
   it('rejects invalid input', () => {
@@ -38,22 +39,29 @@ describe('convertMmkToVnd', () => {
   })
 })
 
-describe('convertVndToMmk', () => {
-  it('is the exact inverse of the forward conversion', () => {
-    for (const fee of [0, 1.5, 2, 2.5, 3, 7.25]) {
-      const forward = convertMmkToVnd(100_000, rates, fee)!
-      const reverse = convertVndToMmk(forward.netVnd, rates, fee)!
-      expect(reverse.mmk).toBeCloseTo(100_000, 6)
-      expect(reverse.usdt).toBeCloseTo(forward.usdt, 10)
-      expect(reverse.grossVnd).toBeCloseTo(forward.grossVnd, 6)
-      expect(reverse.feeVnd).toBeCloseTo(forward.feeVnd, 6)
-    }
+describe('convertVndToMmk (sheet: VND TO MMK)', () => {
+  it('matches the spreadsheet with no fee', () => {
+    const r = convertVndToMmk(1_000_000, rates, 0)!
+    expect(r.usdt).toBeCloseTo(38.334738940427819, 10)
+    expect(r.gross).toBeCloseTo(171739.63045311664, 6)
+    expect(r.fee).toBe(0)
+    expect(r.net).toBeCloseTo(171739.63045311664, 6)
   })
 
-  it('matches the spreadsheet: receiving 575,785.83 VND at 2% costs 100,000 MMK', () => {
-    const r = convertVndToMmk(575785.82677165349, rates, 2)!
-    expect(r.mmk).toBeCloseTo(100_000, 6)
-    expect(r.feeVnd).toBeCloseTo(11750.731158605175, 6)
+  it.each([
+    [1.5, 2576.0944567967495, 169163.5359963199],
+    [2, 3434.7926090623328, 168304.8378440543],
+    [2.5, 4293.4907613279165, 167446.13969178873],
+    [3, 5152.1889135934989, 166587.44153952313],
+    [5, 8586.981522655833, 163152.6489304608],
+  ])('matches the spreadsheet at %s%% fee', (fee, profit, received) => {
+    const r = convertVndToMmk(1_000_000, rates, fee)!
+    expect(r.fee).toBeCloseTo(profit, 6)
+    expect(r.net).toBeCloseTo(received, 6)
+  })
+
+  it('reports MMK per 1 VND', () => {
+    expect(convertVndToMmk(1, rates)!.rate).toBeCloseTo(4480 / 26086, 12)
   })
 
   it('rejects invalid input', () => {

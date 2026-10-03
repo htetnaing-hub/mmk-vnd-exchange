@@ -6,22 +6,27 @@ export interface Rates {
   vndPerUsdt: number
 }
 
+/**
+ * One exchange in either direction: the customer sends one currency, it goes
+ * through USDT, and they receive the other currency minus the service fee.
+ */
 export interface Conversion {
-  mmk: number
+  /** Amount the customer sends. */
+  sent: number
   usdt: number
-  /** VND before any service fee is taken. */
-  grossVnd: number
+  /** Amount in the target currency before the fee. */
+  gross: number
   feePercent: number
-  /** The exchanger's profit, taken from the gross VND. */
-  feeVnd: number
-  /** What the customer actually receives. */
-  netVnd: number
-  /** Effective cross rate: VND per 1 MMK. */
-  vndPerMmk: number
+  /** The exchanger's profit, in the target currency. */
+  fee: number
+  /** What the customer actually receives, in the target currency. */
+  net: number
+  /** Target currency per 1 unit of the sent currency. */
+  rate: number
 }
 
-/** Fee tiers offered by default (percent). */
-export const FEE_TIERS = [0, 1.5, 2, 2.5, 3] as const
+/** Fee tiers offered by default (percent), as in the original spreadsheet. */
+export const FEE_TIERS = [0, 1.5, 2, 2.5, 3, 5] as const
 
 export const MAX_FEE_PERCENT = 50
 
@@ -30,56 +35,29 @@ export function isValidFee(feePercent: number): boolean {
 }
 
 /**
- * MMK → USDT → VND, then deduct the service fee.
+ * sent → USDT → target, then deduct the service fee from the target amount.
  * Returns `null` when any input is missing or out of range.
  */
-export function convertMmkToVnd(mmk: number, rates: Rates, feePercent = 0): Conversion | null {
-  const { mmkPerUsdt, vndPerUsdt } = rates
-  if (!Number.isFinite(mmk) || mmk < 0) return null
-  if (!Number.isFinite(mmkPerUsdt) || mmkPerUsdt <= 0) return null
-  if (!Number.isFinite(vndPerUsdt) || vndPerUsdt <= 0) return null
+function exchange(sent: number, sentPerUsdt: number, targetPerUsdt: number, feePercent: number): Conversion | null {
+  if (!Number.isFinite(sent) || sent < 0) return null
+  if (!Number.isFinite(sentPerUsdt) || sentPerUsdt <= 0) return null
+  if (!Number.isFinite(targetPerUsdt) || targetPerUsdt <= 0) return null
   if (!isValidFee(feePercent)) return null
 
-  const usdt = mmk / mmkPerUsdt
-  const grossVnd = usdt * vndPerUsdt
-  const feeVnd = (feePercent / 100) * grossVnd
+  const usdt = sent / sentPerUsdt
+  const gross = usdt * targetPerUsdt
+  const fee = (feePercent / 100) * gross
 
-  return {
-    mmk,
-    usdt,
-    grossVnd,
-    feePercent,
-    feeVnd,
-    netVnd: grossVnd - feeVnd,
-    vndPerMmk: vndPerUsdt / mmkPerUsdt,
-  }
+  return { sent, usdt, gross, feePercent, fee, net: gross - fee, rate: targetPerUsdt / sentPerUsdt }
 }
 
-/**
- * Reverse direction: how much MMK the customer must send so that they receive
- * exactly `netVnd` after the service fee. Returns the same shape as the forward
- * conversion, so the UI can show both directions the same way.
- */
-export function convertVndToMmk(netVnd: number, rates: Rates, feePercent = 0): Conversion | null {
-  const { mmkPerUsdt, vndPerUsdt } = rates
-  if (!Number.isFinite(netVnd) || netVnd < 0) return null
-  if (!Number.isFinite(mmkPerUsdt) || mmkPerUsdt <= 0) return null
-  if (!Number.isFinite(vndPerUsdt) || vndPerUsdt <= 0) return null
-  if (!isValidFee(feePercent)) return null
+/** Customer sends MMK and receives VND. */
+export const convertMmkToVnd = (mmk: number, rates: Rates, feePercent = 0) =>
+  exchange(mmk, rates.mmkPerUsdt, rates.vndPerUsdt, feePercent)
 
-  const grossVnd = netVnd / (1 - feePercent / 100)
-  const usdt = grossVnd / vndPerUsdt
-
-  return {
-    mmk: usdt * mmkPerUsdt,
-    usdt,
-    grossVnd,
-    feePercent,
-    feeVnd: grossVnd - netVnd,
-    netVnd,
-    vndPerMmk: vndPerUsdt / mmkPerUsdt,
-  }
-}
+/** Customer sends VND and receives MMK. */
+export const convertVndToMmk = (vnd: number, rates: Rates, feePercent = 0) =>
+  exchange(vnd, rates.vndPerUsdt, rates.mmkPerUsdt, feePercent)
 
 /** Parse a raw input string (no thousands separators). Empty or partial input yields NaN. */
 export function parseNumber(raw: string): number {

@@ -622,17 +622,12 @@ a:hover {
   margin-bottom: 10px;
 }
 
+/* 7 options (6 tiers + Custom): two balanced rows at every width. */
 .chips {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   clear: both;
-}
-
-@media (min-width: 480px) {
-  .chips {
-    grid-template-columns: repeat(6, 1fr);
-  }
 }
 
 .chip {

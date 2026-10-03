@@ -1,15 +1,14 @@
-import type { Conversion } from './exchange'
-import { formatVnd } from './format'
-
-/** `mmk-vnd`: enter MMK sent. `vnd-mmk`: enter VND the customer should receive. */
+/** `mmk-vnd`: customer sends MMK, receives VND. `vnd-mmk`: customer sends VND, receives MMK. */
 export type Direction = 'mmk-vnd' | 'vnd-mmk'
+
+export type Fiat = 'MMK' | 'VND'
 
 export const isDirection = (v: unknown): v is Direction => v === 'mmk-vnd' || v === 'vnd-mmk'
 
-/** The headline number: VND received (forward) or MMK to send (reverse). */
-export function headline(result: Conversion, direction: Direction): { amount: string; currency: 'VND' | 'MMK' } {
-  return direction === 'mmk-vnd'
-    ? { amount: formatVnd(result.netVnd), currency: 'VND' }
-    : // Round up so the customer always sends enough.
-      { amount: formatVnd(Math.ceil(result.mmk)), currency: 'MMK' }
+export const CURRENCIES: Record<Direction, { from: Fiat; to: Fiat }> = {
+  'mmk-vnd': { from: 'MMK', to: 'VND' },
+  'vnd-mmk': { from: 'VND', to: 'MMK' },
 }
+
+/** A round amount of the sent currency for the "≈" rate line, e.g. 1,000 MMK or 10,000 VND. */
+export const RATE_UNIT: Record<Fiat, number> = { MMK: 1_000, VND: 10_000 }

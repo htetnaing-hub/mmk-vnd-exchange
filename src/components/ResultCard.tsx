@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useI18n } from '../i18n/context'
+import { CURRENCIES, RATE_UNIT, type Direction } from '../lib/direction'
 import type { Conversion } from '../lib/exchange'
-import { formatMmk, formatPercent, formatRate, formatUsdt, formatVnd } from '../lib/format'
-import { headline, type Direction } from '../lib/direction'
+import { formatAmount, formatPercent, formatRate, formatUsdt, formatWhole } from '../lib/format'
 import { CurrencyBadge } from './CurrencyBadge'
 import { ArrowRightIcon, CheckIcon, CopyIcon } from './Icons'
 
@@ -13,8 +13,9 @@ interface ResultCardProps {
 
 export function ResultCard({ result, direction }: ResultCardProps) {
   const { t } = useI18n()
+  const { from, to } = CURRENCIES[direction]
+  const unit = RATE_UNIT[from]
   const [copied, setCopied] = useState(false)
-  const main = result && headline(result, direction)
 
   useEffect(() => {
     if (!copied) return
@@ -23,9 +24,9 @@ export function ResultCard({ result, direction }: ResultCardProps) {
   }, [copied])
 
   async function copy() {
-    if (!main) return
+    if (!result) return
     try {
-      await navigator.clipboard.writeText(main.amount)
+      await navigator.clipboard.writeText(formatWhole(result.net))
       setCopied(true)
     } catch {
       /* clipboard unavailable (insecure context or denied) */
@@ -36,7 +37,7 @@ export function ResultCard({ result, direction }: ResultCardProps) {
     <section className="result" aria-labelledby="result-label">
       <div className="result__top">
         <p className="result__label" id="result-label">
-          {direction === 'mmk-vnd' ? t.customerReceives : t.customerSends}
+          {t.customerReceives}
         </p>
         <button type="button" className="icon-btn icon-btn--on-dark" onClick={copy} disabled={!result}>
           {copied ? <CheckIcon width={16} height={16} /> : <CopyIcon width={16} height={16} />}
@@ -45,10 +46,10 @@ export function ResultCard({ result, direction }: ResultCardProps) {
       </div>
 
       <p className="result__amount" aria-live="polite">
-        {main ? (
+        {result ? (
           <>
-            {main.amount}
-            <span className="result__currency">{main.currency}</span>
+            {formatWhole(result.net)}
+            <span className="result__currency">{to}</span>
           </>
         ) : (
           <span className="result__empty">{t.emptyResult}</span>
@@ -57,14 +58,19 @@ export function ResultCard({ result, direction }: ResultCardProps) {
 
       <p className="result__meta">
         {result && result.feePercent > 0
-          ? t.profitAt(<strong>{formatVnd(result.feeVnd)} VND</strong>, formatPercent(result.feePercent))
+          ? t.profitAt(
+              <strong>
+                {formatWhole(result.fee)} {to}
+              </strong>,
+              formatPercent(result.feePercent),
+            )
           : t.noFeeApplied}
       </p>
 
       <ol className="path" aria-label={t.conversionPath}>
         <li className="path__step">
-          <CurrencyBadge currency="MMK" />
-          <span className="path__value">{result ? formatMmk(result.mmk) : '—'}</span>
+          <CurrencyBadge currency={from} />
+          <span className="path__value">{result ? formatAmount(result.sent) : '—'}</span>
         </li>
         <li className="path__arrow" aria-hidden="true">
           <ArrowRightIcon width={16} height={16} />
@@ -77,16 +83,19 @@ export function ResultCard({ result, direction }: ResultCardProps) {
           <ArrowRightIcon width={16} height={16} />
         </li>
         <li className="path__step">
-          <CurrencyBadge currency="VND" />
-          <span className="path__value">{result ? formatVnd(result.grossVnd) : '—'}</span>
+          <CurrencyBadge currency={to} />
+          <span className="path__value">{result ? formatWhole(result.gross) : '—'}</span>
         </li>
       </ol>
 
       <p className="result__rate">
         {result ? (
           <>
-            1,000 MMK ≈ <strong>{formatMmk(result.vndPerMmk * 1000)} VND</strong>
-            <span className="dot" aria-hidden="true" />1 MMK ≈ {formatRate(result.vndPerMmk)} VND
+            {formatWhole(unit)} {from} ≈{' '}
+            <strong>
+              {formatAmount(result.rate * unit)} {to}
+            </strong>
+            <span className="dot" aria-hidden="true" />1 {from} ≈ {formatRate(result.rate)} {to}
           </>
         ) : (
           t.ratePlaceholder

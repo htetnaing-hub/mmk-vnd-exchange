@@ -10,9 +10,9 @@ function nf(min: number, max: number): Intl.NumberFormat {
   return f
 }
 
-/** VND has no minor unit in everyday use, so round to whole dong. */
-export const formatVnd = (n: number) => nf(0, 0).format(Math.round(n))
-export const formatMmk = (n: number) => nf(0, 2).format(n)
+/** Whole units: what people actually hand over (neither MMK nor VND uses minor units day to day). */
+export const formatWhole = (n: number) => nf(0, 0).format(Math.round(n))
+export const formatAmount = (n: number) => nf(0, 2).format(n)
 export const formatUsdt = (n: number) => nf(2, 4).format(n)
 export const formatRate = (n: number) => nf(0, 4).format(n)
 export const formatPercent = (n: number) => `${nf(0, 2).format(n)}%`

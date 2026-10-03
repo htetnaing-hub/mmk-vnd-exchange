@@ -10,7 +10,7 @@ import { usePersistentState, isString } from './hooks/usePersistentState'
 import { useInView } from './hooks/useInView'
 import { useTheme } from './hooks/useTheme'
 import { useI18n } from './i18n/context'
-import { headline, isDirection, type Direction } from './lib/direction'
+import { CURRENCIES, isDirection, type Direction } from './lib/direction'
 import {
   FEE_TIERS,
   MAX_FEE_PERCENT,
@@ -20,14 +20,11 @@ import {
   parseNumber,
   type Rates,
 } from './lib/exchange'
-import { formatCompact, formatRate } from './lib/format'
+import { formatCompact, formatRate, formatWhole } from './lib/format'
 
 const isFeeChoice = (v: unknown): v is FeeChoice => v === 'custom' || (typeof v === 'number' && isValidFee(v))
 
-const DIRECTIONS: { value: Direction; from: 'MMK' | 'VND'; to: 'MMK' | 'VND' }[] = [
-  { value: 'mmk-vnd', from: 'MMK', to: 'VND' },
-  { value: 'vnd-mmk', from: 'VND', to: 'MMK' },
-]
+const DIRECTIONS: Direction[] = ['mmk-vnd', 'vnd-mmk']
 
 export default function App() {
   const { lang, t, setLang } = useI18n()
@@ -42,10 +39,11 @@ export default function App() {
   const [fee, setFee] = usePersistentState<FeeChoice>('fee', 0, isFeeChoice)
   const [customFee, setCustomFee] = usePersistentState('customFee', '1', isString)
 
-  const forward = direction === 'mmk-vnd'
-  const input = forward
-    ? { raw: amount, set: setAmount, currency: 'MMK' as const, quick: QUICK_AMOUNTS, convert: convertMmkToVnd }
-    : { raw: vndAmount, set: setVndAmount, currency: 'VND' as const, quick: QUICK_AMOUNTS_VND, convert: convertVndToMmk }
+  const { from, to } = CURRENCIES[direction]
+  const input =
+    direction === 'mmk-vnd'
+      ? { raw: amount, set: setAmount, quick: QUICK_AMOUNTS, convert: convertMmkToVnd }
+      : { raw: vndAmount, set: setVndAmount, quick: QUICK_AMOUNTS_VND, convert: convertVndToMmk }
   const inputValue = parseNumber(input.raw)
 
   const rates: Rates = { mmkPerUsdt: parseNumber(mmkRate), vndPerUsdt: parseNumber(vndRate) }
@@ -56,7 +54,6 @@ export default function App() {
   const rateError = (raw: string) => (raw !== '' && !(parseNumber(raw) > 0) ? t.rateError : undefined)
 
   const result = input.convert(inputValue, rates, feePercent)
-  const main = result && headline(result, direction)
 
   const tierFees: number[] = [...FEE_TIERS]
   if (fee === 'custom' && isValidFee(customFeeValue) && !tierFees.includes(customFeeValue)) {
@@ -144,16 +141,16 @@ export default function App() {
               <div className="segmented" role="group" aria-label={t.direction}>
                 {DIRECTIONS.map((d) => (
                   <button
-                    key={d.value}
+                    key={d}
                     type="button"
                     className="segmented__btn"
-                    aria-pressed={direction === d.value}
-                    onClick={() => setDirection(d.value)}
+                    aria-pressed={direction === d}
+                    onClick={() => setDirection(d)}
                   >
-                    <CurrencyBadge currency={d.from} showCode={false} />
-                    {d.from}
+                    <CurrencyBadge currency={CURRENCIES[d].from} showCode={false} />
+                    {CURRENCIES[d].from}
                     <span aria-hidden="true">→</span>
-                    {d.to}
+                    {CURRENCIES[d].to}
                   </button>
                 ))}
               </div>
@@ -161,11 +158,11 @@ export default function App() {
               <NumberField
                 id="amount"
                 key={direction}
-                label={forward ? t.customerSends : t.customerReceives}
+                label={t.customerSends}
                 size="lg"
                 value={input.raw}
                 onValueChange={input.set}
-                unit={<CurrencyBadge currency={input.currency} />}
+                unit={<CurrencyBadge currency={from} />}
                 maxFractionDigits={2}
               >
                 <div className="quick" role="group" aria-label={t.quickAmounts}>
@@ -240,8 +237,8 @@ export default function App() {
       {/* Phone-only summary that appears while the result card is scrolled out of view. */}
       <div className="mobile-bar" data-visible={result !== null && !resultInView} aria-hidden={resultInView}>
         <div>
-          <p className="mobile-bar__label">{forward ? t.customerReceives : t.customerSends}</p>
-          <p className="mobile-bar__value">{main ? `${main.amount} ${main.currency}` : '—'}</p>
+          <p className="mobile-bar__label">{t.customerReceives}</p>
+          <p className="mobile-bar__value">{result ? `${formatWhole(result.net)} ${to}` : '—'}</p>
         </div>
         <button
           type="button"

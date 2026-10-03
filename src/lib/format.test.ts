@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatRawNumber, formatVnd, sanitizeNumberInput } from './format'
+import { formatRawNumber, formatWhole, sanitizeNumberInput } from './format'
 
 describe('sanitizeNumberInput', () => {
   it('removes separators and junk', () => {
@@ -28,8 +28,8 @@ describe('formatRawNumber', () => {
   })
 })
 
-describe('formatVnd', () => {
-  it('rounds to whole dong', () => {
-    expect(formatVnd(587536.557)).toBe('587,537')
+describe('formatWhole', () => {
+  it('rounds to whole units', () => {
+    expect(formatWhole(587536.557)).toBe('587,537')
   })
 })

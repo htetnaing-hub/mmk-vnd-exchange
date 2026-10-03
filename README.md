@@ -19,9 +19,13 @@ You enter three values. Both rates are the price of **1 USDT**.
 
 | Input | Example |
 | --- | --- |
-| Amount to send (MMK) | 100,000 |
-| Binance MMK rate (1 USDT = ? MMK) | 4,445 |
-| Binance VND rate (1 USDT = ? VND) | 26,116 |
+| Amount the customer sends | 1,000,000 |
+| Binance MMK rate (1 USDT = ? MMK) | 4,480 |
+| Binance VND rate (1 USDT = ? VND) | 26,086 |
+
+The money goes through USDT, and your service fee is taken from the currency the customer receives.
+
+**MMK → VND** (customer sends MMK, receives VND)
 
 ```
 USDT              = MMK ÷ MMK rate
@@ -30,15 +34,20 @@ Profit            = VND × fee% ÷ 100
 Customer receives = VND − Profit
 ```
 
-With the example values, 100,000 MMK → 22.4972 USDT → **587,537 VND**. At a 2% fee the profit is 11,751 VND and the customer receives 575,786 VND.
+Example: 1,000,000 MMK → 223.2143 USDT → **5,822,768 VND**. At 2% the profit is 116,455 VND and the customer receives 5,706,313 VND.
 
-**VND → MMK mode** works backwards: enter how much VND the customer should receive, and the app shows how much MMK they need to send (rounded up to the next kyat).
+**VND → MMK** (customer sends VND, receives MMK)
 
 ```
-VND before fee = VND received ÷ (1 − fee% ÷ 100)
-USDT           = VND before fee ÷ VND rate
-MMK to send    = USDT × MMK rate
+USDT              = VND ÷ VND rate
+MMK               = USDT × MMK rate
+Profit            = MMK × fee% ÷ 100
+Customer receives = MMK − Profit
 ```
+
+Example: 1,000,000 VND → 38.3347 USDT → **171,740 MMK**. At 2% the profit is 3,435 MMK and the customer receives 168,305 MMK.
+
+Results are rounded to whole units. These formulas and examples match the original `MMK to VND Exchange App.xlsx` sheet, and the unit tests check every row of it.
 
 ## Features
 
@@ -46,9 +55,9 @@ MMK to send    = USDT × MMK rate
 - **English and Burmese (မြန်မာ)** interface, picked from the browser's language on the first visit
 - Live conversion with thousands separators as you type
 - Quick amount buttons for each direction
-- Fee presets (0%, 1.5%, 2%, 2.5%, 3%) plus a custom fee
+- Fee presets (0%, 1.5%, 2%, 2.5%, 3%, 5%) plus a custom fee
 - Fee comparison table; tap a row to apply that fee
-- MMK → USDT → VND breakdown and effective cross rate
+- Step-by-step breakdown through USDT and the effective cross rate
 - One-tap copy of the result
 - Light and dark themes (follows the system setting by default)
 - Inputs are remembered on the device (localStorage)

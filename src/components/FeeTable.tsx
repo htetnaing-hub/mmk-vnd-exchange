@@ -1,7 +1,7 @@
 import { useI18n } from '../i18n/context'
-import type { Direction } from '../lib/direction'
+import { CURRENCIES, type Direction } from '../lib/direction'
 import type { Conversion } from '../lib/exchange'
-import { formatPercent, formatVnd } from '../lib/format'
+import { formatPercent, formatWhole } from '../lib/format'
 
 interface FeeTableProps {
   rows: Conversion[]
@@ -13,7 +13,7 @@ interface FeeTableProps {
 /** Side-by-side comparison of every fee tier, like the original spreadsheet. */
 export function FeeTable({ rows, direction, selectedFee, onSelect }: FeeTableProps) {
   const { t } = useI18n()
-  const forward = direction === 'mmk-vnd'
+  const { to } = CURRENCIES[direction]
 
   return (
     <section className="card card--flush" aria-labelledby="fee-table-title">
@@ -29,10 +29,10 @@ export function FeeTable({ rows, direction, selectedFee, onSelect }: FeeTablePro
             <tr>
               <th scope="col">{t.fee}</th>
               <th scope="col" className="num">
-                {t.profit} (VND)
+                {t.profit} ({to})
               </th>
               <th scope="col" className="num">
-                {forward ? `${t.customerReceives} (VND)` : `${t.customerSends} (MMK)`}
+                {t.customerReceives} ({to})
               </th>
             </tr>
           </thead>
@@ -58,8 +58,8 @@ export function FeeTable({ rows, direction, selectedFee, onSelect }: FeeTablePro
                       {formatPercent(r.feePercent)}
                     </button>
                   </th>
-                  <td className="num muted">{r.feePercent === 0 ? '—' : formatVnd(r.feeVnd)}</td>
-                  <td className="num strong">{formatVnd(forward ? r.netVnd : Math.ceil(r.mmk))}</td>
+                  <td className="num muted">{r.feePercent === 0 ? '—' : formatWhole(r.fee)}</td>
+                  <td className="num strong">{formatWhole(r.net)}</td>
                 </tr>
               )
             })}

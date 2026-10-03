@@ -14,8 +14,8 @@ const en = {
   switchLanguage: 'Switch to Burmese',
 
   eyebrow: 'Binance P2P calculator',
-  title: 'Exchange MMK to VND',
-  lead: 'Convert Myanmar Kyat to Vietnamese Dong through USDT, then compare what your customer receives at each service fee.',
+  title: 'Exchange MMK ⇄ VND',
+  lead: 'Convert between Myanmar Kyat and Vietnamese Dong through USDT, then compare what your customer receives at each service fee.',
 
   convert: 'Convert',
   savedOnDevice: 'Values are saved on this device',
@@ -30,8 +30,8 @@ const en = {
   ratesNote: 'price of 1 USDT',
   mmkRate: 'MMK rate',
   vndRate: 'VND rate',
-  mmkRateHint: 'Buy USDT with MMK',
-  vndRateHint: 'Sell USDT for VND',
+  mmkRateHint: 'Price of 1 USDT in MMK',
+  vndRateHint: 'Price of 1 USDT in VND',
   rateError: 'Rate must be greater than 0',
 
   serviceFee: 'Service fee',
@@ -76,8 +76,8 @@ const my: Messages = {
   switchLanguage: 'အင်္ဂလိပ်ဘာသာသို့ ပြောင်းရန်',
 
   eyebrow: 'Binance P2P ဂဏန်းတွက်စက်',
-  title: 'MMK မှ VND သို့ ငွေလဲရန်',
-  lead: 'မြန်မာကျပ်ငွေကို USDT မှတစ်ဆင့် ဗီယက်နမ်ဒေါင်ငွေသို့ တွက်ချက်ပြီး ဝန်ဆောင်ခနှုန်းအလိုက် ဖောက်သည်ရရှိမည့်ငွေကို နှိုင်းယှဉ်ကြည့်ပါ။',
+  title: 'MMK ⇄ VND ငွေလဲရန်',
+  lead: 'မြန်မာကျပ်ငွေနှင့် ဗီယက်နမ်ဒေါင်ငွေကို USDT မှတစ်ဆင့် အပြန်အလှန် တွက်ချက်ပြီး ဝန်ဆောင်ခနှုန်းအလိုက် ဖောက်သည်ရရှိမည့်ငွေကို နှိုင်းယှဉ်ကြည့်ပါ။',
 
   convert: 'တွက်ချက်ရန်',
   savedOnDevice: 'ထည့်ထားသော တန်ဖိုးများကို ဤစက်တွင် သိမ်းထားပါသည်',
@@ -92,8 +92,8 @@ const my: Messages = {
   ratesNote: '1 USDT ၏ ဈေးနှုန်း',
   mmkRate: 'MMK ဈေးနှုန်း',
   vndRate: 'VND ဈေးနှုန်း',
-  mmkRateHint: 'MMK ဖြင့် USDT ဝယ်သည့်ဈေး',
-  vndRateHint: 'USDT ကို VND ဖြင့် ရောင်းသည့်ဈေး',
+  mmkRateHint: '1 USDT ၏ MMK ဈေး',
+  vndRateHint: '1 USDT ၏ VND ဈေး',
   rateError: 'ဈေးနှုန်းသည် 0 ထက် ကြီးရပါမည်',
 
   serviceFee: 'ဝန်ဆောင်ခ',
