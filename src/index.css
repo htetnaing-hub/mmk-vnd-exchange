@@ -785,7 +785,8 @@ a:hover {
 
 .path__step {
   display: flex;
-  flex: 1;
+  /* Size by content so long amounts (e.g. 20,000,000) get the room they need. */
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
@@ -862,6 +863,10 @@ a:hover {
 }
 
 .table thead th {
+  /* Long headers like "Customer receives (MMK)" wrap instead of widening the table. */
+  white-space: normal;
+  vertical-align: bottom;
+  line-height: 1.35;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   background: var(--surface-2);
@@ -925,7 +930,22 @@ a:hover {
 @media (max-width: 420px) {
   .table th,
   .table td {
-    padding-inline: 14px;
+    padding-inline: 12px;
+  }
+
+  .table th:first-child,
+  .table td:first-child {
+    padding-left: 18px;
+  }
+
+  .table th:last-child,
+  .table td:last-child {
+    padding-right: 18px;
+  }
+
+  .table thead th {
+    font-size: 11px;
+    letter-spacing: 0.02em;
   }
 }
 
@@ -1078,12 +1098,37 @@ a:hover {
 }
 
 @media (max-width: 420px) {
+  .result {
+    padding: 20px 18px;
+  }
+
+  .path {
+    gap: 4px;
+    padding: 12px 10px;
+  }
+
+  .path__value {
+    font-size: 14px;
+  }
+
+  .path__arrow svg {
+    width: 12px;
+    height: 12px;
+  }
+
   .result__rate .dot {
     display: none;
   }
 
   .result__rate {
     gap: 2px 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .path__value {
+    font-size: 13px;
+    letter-spacing: -0.01em;
   }
 }
 
